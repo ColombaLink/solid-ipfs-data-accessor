@@ -1,0 +1,19 @@
+#!/bin/bash
+# This script assumes to be executed in a empty directory
+# Where the name of the directory stands for the project name
+
+git init
+git remote add solid-starter-module  git@github.com:FUUbi/solid-css-demo-module.git
+git fetch solid-starter-module main
+git checkout FETCH_HEAD -- .
+git remote remove solid-starter-module
+
+# Get the name of the directory
+project_name="${PWD##*/}"
+
+sed -i '' -e 's/css-demo-module/'"${project_name}"'/g' "$(find . -type f)"
+git commit -am "chore: Initialize repository."
+
+echo "Run"
+echo "npm install && npm run start"
+echo "to get started"

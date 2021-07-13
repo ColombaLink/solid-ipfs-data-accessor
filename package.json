@@ -1,0 +1,67 @@
+{
+  "name": "css-demo-module",
+  "version": "1.0.0",
+  "description": "A starter project to kickstart the development of a CSS module.",
+  "keywords": [
+    "solid",
+    "linked-data",
+    "rdf",
+    "ldp",
+    "starter-module"
+  ],
+  "license": "MIT",
+  "author": " <your@email.com> (https://optional.link/to-your-website/)",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "repository": "git@github.com:GitHubUserName/RepositoryName.git",
+  "bugs": {
+    "url": "https://github.com/GitHubUserName/RepositoryName/issues"
+  },
+  "homepage": "https://github.com/GitHubUserName/RepositoryName#readme",
+  "files": [
+    "config",
+    "dist"
+  ],
+  "lsd:module": "https://linkedsoftwaredependencies.org/bundles/npm/css-demo-module",
+  "lsd:components": "dist/components/components.jsonld",
+  "lsd:contexts": {
+    "https://linkedsoftwaredependencies.org/bundles/npm/css-demo-module/^1.0.0/components/context.jsonld": "dist/components/context.jsonld"
+  },
+  "lsd:importPaths": {
+    "https://linkedsoftwaredependencies.org/bundles/npm/css-demo-module/^1.0.0/components/": "dist/components/",
+    "https://linkedsoftwaredependencies.org/bundles/npm/css-demo-module/^1.0.0/config/": "config/",
+    "https://linkedsoftwaredependencies.org/bundles/npm/css-demo-module/^1.0.0/dist/": "dist/"
+  },
+  "scripts": {
+    "build": "npm run build:ts && npm run build:components",
+    "build:components": "componentsjs-generator -s src -c dist/components -i .componentsignore",
+    "build:ts": "tsc",
+    "lint": "eslint . --cache",
+    "prepare": "npm run build",
+    "start": "npm run build && npm run build && npx community-solid-server -c config/default.json  -m ."
+  },
+  "dependencies": {
+    "@rdfjs/data-model": "^1.2.0",
+    "@types/node-fetch": "^2.5.7",
+    "@types/rdf-js": "^4.0.0",
+    "node-fetch": "^2.6.1",
+    "urijs": "^1.19.5"
+  },
+  "peerDependencies": {
+    "@solid/community-server": "^0.8.1"
+  },
+  "devDependencies": {
+    "@solid/community-server": "^1.0.0-beta.0",
+    "@tsconfig/node14": "^1.0.0",
+    "@typescript-eslint/eslint-plugin": "^4.11.1",
+    "@typescript-eslint/parser": "^4.11.1",
+    "componentsjs-generator": "^2.0.0",
+    "eslint": "^7.16.0",
+    "eslint-config-es": "^3.26.13",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-tsdoc": "^0.2.10",
+    "eslint-plugin-unused-imports": "^1.0.1",
+    "husky": "^4.3.6",
+    "typescript": "^4.1.3"
+  }
+}
