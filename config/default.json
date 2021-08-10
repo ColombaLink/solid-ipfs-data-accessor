@@ -25,19 +25,65 @@
     "files-scs:config/ldp/metadata-writer/default.json",
     "files-scs:config/ldp/permissions/acl.json",
     "files-scs:config/storage/key-value/memory.json",
-    "files-scs:config/storage/resource-store/memory.json",
     "files-scs:config/util/auxiliary/acl.json",
     "files-scs:config/util/identifiers/suffix.json",
     "files-scs:config/util/index/default.json",
+    "files-scs:config/util/logging/winston.json",
     "files-scs:config/util/representation-conversion/default.json",
     "files-scs:config/util/resource-locker/memory.json",
-    "files-scs:config/util/variables/default.json"
+    "files-scs:config/util/variables/default.json",
+
+    "files-scs:config/storage/resource-store/stores/converting.json",
+    "files-scs:config/storage/resource-store/stores/data-accessor.json",
+    "files-scs:config/storage/resource-store/stores/locking.json",
+    "files-scs:config/storage/resource-store/stores/patching.json"
   ],
   "@graph": [
+
     {
-      "@id": "urn:solid-server:default:LoggerFactory",
-      "@type": "CustomLoggerFactory",
-      "CustomLoggerFactory:_level": "info"
+      "@id": "css-demo-module:FileIdentifierMapper",
+      "@type": "ExtensionBasedMapper"
+    },
+
+    {
+      "comment": "A default store setup with a file system backend.",
+      "@id": "urn:solid-server:default:ResourceStore",
+      "@type": "MonitoringStore",
+      "MonitoringStore:_source": {
+        "@id": "urn:solid-server:default:ResourceStore_Locking",
+        "LockingResourceStore:_source": {
+          "@id": "urn:solid-server:default:ResourceStore_Patching",
+          "PatchingStore:_source": {
+            "@id": "urn:solid-server:default:ResourceStore_Converting",
+            "RepresentationConvertingStore:_source": {
+              "@id": "urn:solid-server:default:ResourceStore_DataAccessor",
+              "DataAccessorBasedStore:_accessor": {
+                "@id": "urn:solid-server:default:IpfsAccessor"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "comment": "Stores data on a file system.",
+      "@id": "css-demo-module:IpfsAccessor",
+      "@type": "IpfsAccessor"
+    },
+    {
+      "@id": "urn:solid-server:default:IPFSHelper",
+      "@type": "IPFSHelper",
+      "IPFSHelper:_options_repo": "/tmp/solid-ipfs1"
+    },
+    {
+      "@id": "urn:solid-server:default:IpfsAccessor",
+      "@type": "IpfsAccessor",
+      "IpfsAccessor:_resourceMapper": {
+        "@id": "urn:solid-server:default:FileIdentifierMapper"
+      },
+      "IpfsAccessor:_ipfsHelper": {
+        "@id": "urn:solid-server:default:IPFSHelper"
+      }
     }
   ]
 }

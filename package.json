@@ -38,24 +38,26 @@
     "build:ts": "tsc",
     "lint": "eslint . --cache",
     "prepare": "npm run build",
-    "start": "npm run build && npm run build && npx community-solid-server -c config/default.json  -m ."
+    "start": "npm run build && npm run build && npx community-solid-server -c config/default.json -m . -f /"
   },
   "dependencies": {
     "@rdfjs/data-model": "^1.2.0",
+    "@types/node": "^14.14.41",
     "@types/node-fetch": "^2.5.7",
     "@types/rdf-js": "^4.0.0",
+    "ipfs": "^0.54.2",
     "node-fetch": "^2.6.1",
     "urijs": "^1.19.5"
   },
   "peerDependencies": {
-    "@solid/community-server": "^0.8.1"
+    "@solid/community-server": "^1.0.0-beta.0"
   },
   "devDependencies": {
     "@solid/community-server": "^1.0.0-beta.0",
     "@tsconfig/node14": "^1.0.0",
     "@typescript-eslint/eslint-plugin": "^4.11.1",
     "@typescript-eslint/parser": "^4.11.1",
-    "componentsjs-generator": "^2.0.0",
+    "componentsjs-generator": "^2.1.0",
     "eslint": "^7.16.0",
     "eslint-config-es": "^3.26.13",
     "eslint-plugin-import": "^2.22.1",

@@ -35,6 +35,11 @@ module.exports = {
     'quote-props': ['error', 'consistent-as-needed'],
     'sort-imports': 'off',
     'strict': 'off',
+    'func-style': 'off',
+    'unicorn/import-style': 'off',
+    '@typescript-eslint/naming-convention': 'off',
+    'unicorn/no-array-callback-reference': 'off',
+    'unicorn/prefer-spread': 'off',
   },
   overrides: [
     {

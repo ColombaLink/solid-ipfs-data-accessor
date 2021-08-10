@@ -12,6 +12,9 @@
     "typeRoots": [
       "types",
       "node_modules/@types"
+    ],
+    "lib": [
+      "DOM"
     ]
   },
   "include": [
