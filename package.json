@@ -1,6 +1,6 @@
 {
-  "name": "css-demo-module",
-  "version": "1.0.0",
+  "name": "solid-ipfs-data-accessor",
+  "version": "0.0.1",
   "description": "A starter project to kickstart the development of a CSS module.",
   "keywords": [
     "solid",
@@ -22,15 +22,15 @@
     "config",
     "dist"
   ],
-  "lsd:module": "https://linkedsoftwaredependencies.org/bundles/npm/css-demo-module",
+  "lsd:module": "https://linkedsoftwaredependencies.org/bundles/npm/solid-ipfs-data-accessor",
   "lsd:components": "dist/components/components.jsonld",
   "lsd:contexts": {
-    "https://linkedsoftwaredependencies.org/bundles/npm/css-demo-module/^1.0.0/components/context.jsonld": "dist/components/context.jsonld"
+    "https://linkedsoftwaredependencies.org/bundles/npm/solid-ipfs-data-accessor/^1.0.0/components/context.jsonld": "dist/components/context.jsonld"
   },
   "lsd:importPaths": {
-    "https://linkedsoftwaredependencies.org/bundles/npm/css-demo-module/^1.0.0/components/": "dist/components/",
-    "https://linkedsoftwaredependencies.org/bundles/npm/css-demo-module/^1.0.0/config/": "config/",
-    "https://linkedsoftwaredependencies.org/bundles/npm/css-demo-module/^1.0.0/dist/": "dist/"
+    "https://linkedsoftwaredependencies.org/bundles/npm/solid-ipfs-data-accessor/^1.0.0/components/": "dist/components/",
+    "https://linkedsoftwaredependencies.org/bundles/npm/solid-ipfs-data-accessor/^1.0.0/config/": "config/",
+    "https://linkedsoftwaredependencies.org/bundles/npm/solid-ipfs-data-accessor/^1.0.0/dist/": "dist/"
   },
   "scripts": {
     "build": "npm run build:ts && npm run build:components",

@@ -3,7 +3,7 @@
 # Where the name of the directory stands for the project name
 
 git init
-git remote add solid-starter-module  git@github.com:FUUbi/solid-css-demo-module.git
+git remote add solid-starter-module  git@github.com:FUUbi/solid-solid-ipfs-data-accessor.git
 git fetch solid-starter-module main
 git checkout FETCH_HEAD -- .
 git remote remove solid-starter-module
@@ -11,7 +11,7 @@ git remote remove solid-starter-module
 # Get the name of the directory
 project_name="${PWD##*/}"
 
-sed -i '' -e 's/css-demo-module/'"${project_name}"'/g' "$(find . -type f)"
+find . -type f -print0 | xargs -0 sed -i '' -e 's/solid-ipfs-data-accessor/'"${project_name}"'/g'
 git commit -am "chore: Initialize repository."
 
 echo "Run"

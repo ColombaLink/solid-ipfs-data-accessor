@@ -1,9 +1,9 @@
 {
   "@context": [
-    "https://linkedsoftwaredependencies.org/bundles/npm/css-demo-module/^1.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/solid-ipfs-data-accessor/^1.0.0/components/context.jsonld",
     "https://linkedsoftwaredependencies.org/bundles/npm/@solid/community-server/^1.0.0/components/context.jsonld",
     {
-      "css-demo-module": "urn:css-demo-module:default:",
+      "solid-ipfs-data-accessor": "urn:solid-ipfs-data-accessor:default:",
       "solid-server": "urn:solid-server:default:"
     }
   ],
@@ -41,7 +41,7 @@
   "@graph": [
 
     {
-      "@id": "css-demo-module:FileIdentifierMapper",
+      "@id": "solid-ipfs-data-accessor:FileIdentifierMapper",
       "@type": "ExtensionBasedMapper"
     },
 
@@ -67,7 +67,7 @@
     },
     {
       "comment": "Stores data on a file system.",
-      "@id": "css-demo-module:IpfsAccessor",
+      "@id": "solid-ipfs-data-accessor:IpfsAccessor",
       "@type": "IpfsAccessor"
     },
     {
