@@ -314,18 +314,6 @@ export class IpfsAccessor implements DataAccessor {
   }
 
   /**
-   * Helper function to generate the quads describing that the resource URIs are children of the container URI.
-   * @param containerURI - The URI of the container.
-   * @param childURIs - The URI of the child resources.
-   *
-   * @returns The generated quads.
-   */
-  private generateContainmentQuads(containerURI: NamedNode, childURIs: string[]): Quad[] {
-    // Todo [2021-12-31]: refactor according to https://github.com/solid/community-server/commit/cae9d54facf597df2ec099aa62c3ceb11ce1179c#diff-563fb34a7529ae760bea001c0e3b900736ff2702bd9d4c7ecc84f1ac908a1485
-    return new RepresentationMetadata(containerURI,
-      { [LDP.contains]: childURIs.map(DataFactory.namedNode) }).quads();
-  }
-  /**
    * Helper function to add file system related metadata.
    * @param metadata - Metadata object to add to.
    * @param stats - Stats of the file/directory corresponding to the resource.
