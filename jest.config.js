@@ -24,6 +24,7 @@ module.exports = {
   // See https://github.com/matthieubosquet/ts-dpop/issues/13
   moduleNameMapper: {
     '^jose/(.*)$': '<rootDir>/node_modules/jose/dist/node/cjs/$1',
+    '^multiformats/(.*)$': '<rootDir>/node_modules/multiformats/cjs/src/$1',
   },
   // Slower machines had problems calling the WebSocket integration callbacks on time
   testTimeout: 60000,
