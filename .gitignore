@@ -4,3 +4,4 @@ node_modules
 componentsjs-error-state.json
 settings.json
 .idea
+coverage
