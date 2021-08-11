@@ -1,3 +1,2 @@
 // IPFS Accessor
-export * from './storage/IpfsAccessor';
-export * from './ipfs/IpfsHelper';
+export * from './fs/ipfs/IpfsFs';
