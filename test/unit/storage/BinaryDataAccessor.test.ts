@@ -9,8 +9,9 @@ import {
 } from "@solid/community-server";
 import {mockFs} from "../../util/Util";
 import {BinaryDataAccessor} from "../../../src/storage/BinaryDataAccessor";
-
 jest.mock('fs');
+
+import {promises} from "fs";
 
 const rootFilePath = 'uploads';
 const now = new Date();
@@ -24,7 +25,7 @@ describe('A FileDataAccessor', (): void => {
 
   beforeEach(async(): Promise<void> => {
     cache = mockFs(rootFilePath, now);
-    accessor = new BinaryDataAccessor(new ExtensionBasedMapper(base, rootFilePath));
+    accessor = new BinaryDataAccessor(new ExtensionBasedMapper(base, rootFilePath), promises);
 
     metadata = new RepresentationMetadata(APPLICATION_OCTET_STREAM);
 
