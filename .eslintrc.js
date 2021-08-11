@@ -40,6 +40,7 @@ module.exports = {
     '@typescript-eslint/naming-convention': 'off',
     'unicorn/no-array-callback-reference': 'off',
     'unicorn/prefer-spread': 'off',
+    'unicorn/catch-error-name': 'off',
   },
   overrides: [
     {
