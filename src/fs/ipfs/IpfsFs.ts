@@ -1,13 +1,16 @@
 import type { StatsBase } from 'fs';
 import { Readable } from 'stream';
 import type CID from 'cids';
-import { create } from 'ipfs';
 import type { IPFS } from 'ipfs';
+import { create } from 'ipfs';
 import type { SystemError } from '@solid/community-server';
+import type { OpenMode, PathLike } from 'node:fs';
+import type { FileHandle } from 'node:fs/promises';
+import { systemErrorInvalidArgument } from '../../errors/system/SystemErrors';
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/naming-convention */
 
-export class IPFSHelper {
+export class IpfsFs {
   private readonly node: Promise<IPFS>;
 
   public constructor(options: { repo: string }) {
@@ -24,16 +27,53 @@ export class IPFSHelper {
     this.node = create(options);
   }
 
-  public async write(file: { path: string; content: Readable }) {
-    // eslint-disable-next-line no-console
-    console.log(file.path);
+  public async write(path: string, content: Readable|string) {
     const mfs = await this.mfs();
-    return mfs.write(file.path, file.content, { create: true, mtime: new Date() });
+    return mfs.write(path, content, { create: true, mtime: new Date() });
   }
 
   public async read(path: string) {
     const mfs = await this.mfs();
     return Readable.from(mfs.read(path));
+  }
+
+  /**
+   * Asynchronously reads the entire contents of a file.
+   * @param path A absolute path of type string. If a URL, Buffer or FileHandle is provided
+   * a System Error [EINVAL 22](https://man7.org/linux/man-pages/man3/errno.3.html) will be thrown.
+   * @param options An object that may contain an optional flag.
+   */
+  public async readFile(path: PathLike | FileHandle, options?: { encoding?: BufferEncoding; flag?: OpenMode } | null): Promise<Buffer | string> {
+    if (typeof path !== 'string') {
+      throw systemErrorInvalidArgument(
+        new Error(`The provided path parameter is of type ${typeof path}. The readFile function only supports strings.`),
+        'readFile',
+      );
+    }
+
+    if (!path.startsWith('/')) {
+      throw systemErrorInvalidArgument(
+        new Error(`Only absolute paths are supported.` +
+            `The provided path ${path} does not start it the  slash character (/).` +
+            `Ex. /some-root/folder`),
+        'readFile',
+      );
+    }
+    const mfs = await this.mfs();
+    return new Promise((resolve, reject) => {
+      const buffer: any[] = [];
+      const fileStream = Readable.from(mfs.read(path));
+      fileStream.on('data', chunk => buffer.push(chunk));
+      fileStream.on('end', () => {
+        const resultBuffer = Buffer.concat(buffer);
+        if (options && options.encoding) {
+          resolve(resultBuffer.toString(options.encoding));
+        } else {
+          resolve(resultBuffer);
+        }
+      });
+      fileStream.on('error', err => reject(err));
+    });
   }
 
   public async stop() {
