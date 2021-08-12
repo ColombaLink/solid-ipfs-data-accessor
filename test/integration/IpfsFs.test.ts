@@ -34,9 +34,9 @@ describe("A ipfs fs ", () => {
         fsPromises.rmdir(paths.node, {recursive: true})
    })
 
-    it('should write and read a file', async () => {
+    it('should write and read a file with readFile', async () => {
         const nodeWriteResult = await fsPromises.writeFile(`${paths.node}/test`, "hello");
-        const ipfsWriteResult = await ipfsFs.write(`${paths.mfsPaths.root}/test`, "hello")
+        const ipfsWriteResult = await ipfsFs.writeFile(`${paths.mfsPaths.root}/test`, "hello")
         expect(ipfsWriteResult).toBe(nodeWriteResult)
 
 
@@ -48,4 +48,23 @@ describe("A ipfs fs ", () => {
         const ipfsReadUtf8Result = await ipfsFs.readFile(`${paths.mfsPaths.root}/test`, {encoding: "utf8"});
         expect(ipfsReadUtf8Result).toStrictEqual(nodeReadUtf8Result);
     })
+
+    it('should write and read a file with string with encoding', async () => {
+        let nodeWriteResult = await fsPromises.writeFile(`${paths.node}/test`, "12AA", 'hex');
+        let ipfsWriteResult = await ipfsFs.writeFile(`${paths.mfsPaths.root}/test`, "12AA",'hex' )
+        expect(ipfsWriteResult).toBe(nodeWriteResult)
+
+        let nodeReadResult = await fsPromises.readFile(`${paths.node}/test`, {encoding: "hex"});
+        let ipfsReadResult = await ipfsFs.readFile(`${paths.mfsPaths.root}/test`, {encoding: "hex"});
+        expect(ipfsReadResult).toStrictEqual(nodeReadResult);
+
+        nodeWriteResult = await fsPromises.writeFile(`${paths.node}/test`, "12AA", {encoding: "hex"});
+        ipfsWriteResult = await ipfsFs.writeFile(`${paths.mfsPaths.root}/test`, "12AA",{encoding: "hex"} )
+        expect(ipfsWriteResult).toBe(nodeWriteResult)
+
+        nodeReadResult = await fsPromises.readFile(`${paths.node}/test`, {encoding: "hex"});
+        ipfsReadResult = await ipfsFs.readFile(`${paths.mfsPaths.root}/test`, {encoding: "hex"});
+        expect(ipfsReadResult).toStrictEqual(nodeReadResult);
+    })
+
 })
