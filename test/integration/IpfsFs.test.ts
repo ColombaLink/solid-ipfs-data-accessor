@@ -71,10 +71,12 @@ describe("A ipfs fs ", () => {
         let nodeWriteResult = await fsPromises.mkdir(`${paths.node}/test`);
         let ipfsWriteResult = await ipfsFs.mkdir(`${paths.mfsPaths.root}/test`)
         expect(ipfsWriteResult).toBe(nodeWriteResult)
+        expect(ipfsFs.stats(`${paths.mfsPaths.root}/test`)).toBeDefined();
 
         nodeWriteResult = await fsPromises.mkdir(`${paths.node}/test/withSlash/`);
         ipfsWriteResult = await ipfsFs.mkdir(`${paths.mfsPaths.root}/test/withSlash/`)
         expect(ipfsWriteResult).toBe(nodeWriteResult)
+        expect(ipfsFs.stats(`${paths.mfsPaths.root}/test/withSlash/`)).toBeDefined();
     })
 
     it('should recursively create directories and read directories', async () => {
@@ -82,15 +84,17 @@ describe("A ipfs fs ", () => {
         let nodeWriteResult = await fsPromises.mkdir(`${paths.node}/`, {recursive: true});
         let ipfsWriteResult = await ipfsFs.mkdir(`${paths.mfsPaths.root}/`, {recursive: true})
         expect(ipfsWriteResult).toBe(nodeWriteResult) // undefined
+        expect(ipfsFs.stats(`${paths.mfsPaths.root}/`)).toBeDefined();
 
         // Base case 2: create recursive dir on root dir
         nodeWriteResult = await fsPromises.mkdir(`${paths.node}/test/create/dirs/recursive`, {recursive: true});
         ipfsWriteResult = await ipfsFs.mkdir(`${paths.mfsPaths.root}/test/create/dirs/recursive`, {recursive: true})
         expect(ipfsWriteResult).toBe(nodeWriteResult!.replace(paths.node, "")) // /test
+        expect(ipfsFs.stats(`${paths.mfsPaths.root}/test/create/dirs/recursive`)).toBeDefined();
 
         nodeWriteResult = await fsPromises.mkdir(`${paths.node}/test/create/dirs/recursive`, {recursive: true});
         ipfsWriteResult = await ipfsFs.mkdir(`${paths.mfsPaths.root}/test/create/dirs/recursive`, {recursive: true})
         expect(ipfsWriteResult).toBe(nodeWriteResult) // undefined
-
+        expect(ipfsFs.stats(`${paths.mfsPaths.root}/test/create/dirs/recursive`)).toBeDefined();
     })
 })
