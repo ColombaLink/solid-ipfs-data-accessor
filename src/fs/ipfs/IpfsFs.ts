@@ -40,7 +40,7 @@ export class IpfsFs {
    * If `encoding` is not supplied, the default of `'utf8'` is used.
    * If `mode` is not supplied, the default of `0o666` is used.
    * If `mode` is a string, it is parsed as an octal integer.
-   * If `flag` is not supplied, the default of `'w'` is used.
+   * If `flag` is supplied, it will be ignored.
    */
   public async writeFile(
     path: PathLike | FileHandle,
@@ -62,7 +62,7 @@ export class IpfsFs {
       data = Buffer.from(data, encoding);
     }
 
-    let mode;
+    let mode: Mode = '0o666';
     if (options && (options as { mode: Mode }).mode) {
       // eslint-disable-next-line prefer-destructuring
       mode = (options as { mode: Mode }).mode;
