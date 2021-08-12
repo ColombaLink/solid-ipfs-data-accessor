@@ -4,11 +4,10 @@ import type CID from 'cids';
 import type { IPFS } from 'ipfs';
 import { create } from 'ipfs';
 import type { SystemError } from '@solid/community-server';
-import type { BaseEncodingOptions, OpenMode, PathLike, Mode } from 'node:fs';
+import type { BaseEncodingOptions, OpenMode, PathLike, Mode, MakeDirectoryOptions } from 'node:fs';
 
 import type { FileHandle } from 'node:fs/promises';
 import { systemErrorInvalidArgument } from '../../errors/system/SystemErrors';
-import { type } from 'os';
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -168,20 +167,91 @@ export class IpfsFs {
     }
   }
 
-  public async mkdir(path: string): Promise<void> {
-    try {
-      const mfs = await this.mfs();
-      await mfs.mkdir(path);
-    } catch (ex: unknown) {
-      if ((ex as any).code && (ex as any).code === 'ERR_LOCK_EXISTS') {
-        const sysError: SystemError = { ...(ex as SystemError),
-          code: 'EEXIST',
-          syscall: 'mkdir',
-          errno: -17,
-          path };
-        throw sysError;
+  /**
+   * Asynchronous mkdir(2) - create a directory.
+   * @param path A absolute path of type string. If a URL, Buffer or FileHandle is provided
+   * a System Error [EINVAL 22](https://man7.org/linux/man-pages/man3/errno.3.html) will be thrown.
+   * @param options Either the file mode, or an object optionally specifying the file mode and whether parent folders
+   * should be created. If a string is passed, it is parsed as an octal integer. If not specified, defaults to `0o777`.
+   */
+  public async mkdir(path: PathLike, options?: Mode | (MakeDirectoryOptions & { recursive?: boolean }) | null): Promise<void | (undefined | string)> {
+    const createDirectory = async(dir: string, mode: Mode) => {
+      try {
+        const mfs = await this.mfs();
+        await mfs.mkdir(dir, { mode });
+      } catch (ex: unknown) {
+        if ((ex as any).code && (ex as any).code === 'ERR_LOCK_EXISTS') {
+          const sysError: SystemError = { ...(ex as SystemError),
+            code: 'EEXIST',
+            syscall: 'mkdir',
+            errno: -17,
+            path: dir };
+          throw sysError;
+        }
       }
+    };
+    this.assertIsString(path);
+    this.assertIsAbsolute(path as string);
+
+    let mode: Mode = '0o666';
+    if (options && (options as { mode: Mode }).mode) {
+      // eslint-disable-next-line prefer-destructuring
+      mode = (options as { mode: Mode }).mode;
+    } else if (typeof options === 'string' || typeof options === 'number') {
+      mode = options;
     }
+
+    if (options && (options as { recursive: boolean }).recursive) {
+      // Find out which is the first non existing directory of a recursive mkdir call.
+      // The dir will be returned if the "recursive" option is set.
+      const notExistingDirs = await this.getAllNonExistingPaths(path as string);
+      if (notExistingDirs.length === 0) {
+        return;
+      }
+      for (const dir of notExistingDirs) {
+        await createDirectory(dir, mode);
+      }
+      return notExistingDirs[0];
+    }
+
+    await createDirectory(path as string, mode);
+  }
+
+  /**
+   * @param path A absolute path of type string. (starts with /)
+   * @private
+   * @return returns the first non existing directory
+   *                 or undefined if all directories exist.
+   */
+  private async getAllNonExistingPaths(path: string): Promise<string[]> {
+    let dir = '';
+    const paths = [];
+    let previousStat = null;
+    let foundFirstNonExistingDirectory = false;
+    for (const part of path.slice(1).split('/')) {
+      dir = `${dir}/${part}`;
+      if (foundFirstNonExistingDirectory) {
+        paths.push(dir);
+        continue;
+      }
+
+      const stats = await this.stats(dir).catch(error => {
+        if (error.code === 'ERR_NOT_FOUND') {
+          return null;
+        }
+        throw error;
+      });
+
+      if (previousStat === null && stats === null) {
+        paths.push(dir);
+      } else if (previousStat && stats === null) {
+        foundFirstNonExistingDirectory = true;
+        paths.push(dir);
+      }
+      previousStat = stats;
+    }
+
+    return paths;
   }
 
   public async readdir(path: string): Promise<string[]> {
