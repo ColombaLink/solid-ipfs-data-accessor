@@ -4,10 +4,10 @@ import type CID from 'cids';
 import type { IPFS } from 'ipfs';
 import { create } from 'ipfs';
 import type { SystemError } from '@solid/community-server';
-import type { BaseEncodingOptions, OpenMode, PathLike, Mode, MakeDirectoryOptions, Dir, OpenDirOptions } from 'node:fs';
+import type { BaseEncodingOptions, OpenMode, PathLike, Mode, MakeDirectoryOptions, Dir, OpenDirOptions, RmDirOptions } from 'node:fs';
 
 import type { FileHandle } from 'node:fs/promises';
-import { systemErrorInvalidArgument } from '../../errors/system/SystemErrors';
+import { systemErrorInvalidArgument, systemErrorNotEmptyDir } from '../../errors/system/SystemErrors';
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -319,9 +319,58 @@ export class IpfsFs {
     };
   }
 
-  public async rmdir(path: string): Promise<void> {
+  //
+  // Asynchronous rmdir(2) - delete a directory.
+  // @param path A path to a file. If a URL is provided, it must use the `file:` protocol.
+  //
+  // The recursive option  for the mfs and node.js filesystem have a slightly
+  // different semantics. If the recursive option is not set for
+  // the *node.js fs* and the directory is not empty the method will throw an error.
+  // In comparison the mfs requires the recursive option to be true if a directory
+  // should be deleted. Since the rmdir method will always delete a directory the implementation
+  // sets the recursive option to true while calling the mfs.rm method.
+  // But to mimic the same behavior as the node.js fs the rmdir method first
+  // checks if the directory is empty or the recursive option set to true.
+  // If both conditions are false an error is thrown.
+  //
+  public async rmdir(path: PathLike, options?: RmDirOptions): Promise<void> {
+    this.assertIsString(path);
+    this.assertIsAbsolute(path as string);
     const mfs = await this.mfs();
-    return mfs.rm(path, { recursive: true });
+    if (!options) {
+      options = { maxRetries: 1 };
+    }
+
+    if (!options.recursive) {
+      // Recursive option is not set, so check if dir is empty
+      // eslint-disable-next-line no-unreachable-loop,@typescript-eslint/no-unused-vars,no-unused-vars
+      for await (const _ of await this.opendir(path)) {
+        throw systemErrorNotEmptyDir(
+          new Error(
+            `The directory ${typeof path} is not empty. ` +
+              `Consider using the recursive option to delete a non empty directory ex. (path, {recursive: true})`,
+          ),
+          'rmdir',
+          path as string,
+        );
+      }
+    }
+
+    const tryRmdir = async(tryCount: number): Promise<void> => {
+      if (tryCount < (options as { maxRetries: number }).maxRetries) {
+        tryCount += 1;
+        try {
+          return await mfs.rm(path as string, { recursive: true });
+        } catch (error: unknown) {
+          if (tryCount < (options as { maxRetries: number }).maxRetries && options?.retryDelay) {
+            await new Promise(resolve => setTimeout(resolve, options?.retryDelay));
+            return tryRmdir(tryCount);
+          }
+          throw error;
+        }
+      }
+    };
+    return tryRmdir(0);
   }
 
   public async unlink(path: string): Promise<void> {
@@ -344,4 +393,3 @@ export class IpfsFs {
 export interface IPFSStats extends StatsBase<number> {
   cid: CID;
 }
-

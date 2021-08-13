@@ -1,6 +1,8 @@
 
 import {promises as fsPromises} from "fs";
 import {IpfsFs} from "../../dist";
+import {systemErrorInvalidArgument, systemErrorNotEmptyDir} from "../../src/errors/system/SystemErrors";
+import type {SystemError} from "@solid/community-server";
 
 describe("A ipfs fs ", () => {
     let ipfsFs: IpfsFs
@@ -160,5 +162,42 @@ describe("A ipfs fs ", () => {
         )
 
 
+    })
+
+    it('should delete a directory', async () => {
+        await fsPromises.mkdir(`${paths.node}/test1`);
+        await ipfsFs.mkdir(`${paths.mfsPaths.root}/test1`);
+        expect(await ipfsFs.rmdir(`${paths.mfsPaths.root}/test1`))
+            .toBe(await fsPromises.rmdir(`${paths.node}/test1`));
+
+        await ipfsFs.mkdir(`${paths.mfsPaths.root}/test2/a/b`, {recursive: true});
+        await fsPromises.mkdir(`${paths.node}/test2/a/b`, {recursive: true});
+
+
+        try {await fsPromises.rmdir(`${paths.node}/test2` )}
+        catch (e) {
+            const expectedError = systemErrorNotEmptyDir(new Error(), 'rmdir', `${paths.node}/test2`);
+            expect(e.code).toBe(expectedError.code);
+            expect(e.errno).toBe(expectedError.errno);
+            expect(e.path).toBe(expectedError.path);
+            expect(e.syscall).toBe(expectedError.syscall);
+        }
+
+        try {await ipfsFs.rmdir(`${paths.mfsPaths.root}/test2`)}
+        catch (e) {
+            const expectedError = systemErrorNotEmptyDir(new Error(), 'rmdir', `${paths.mfsPaths.root}/test2`);
+            expect(e.message).toBe("The directory string is not empty. Consider using the recursive option to delete a non empty directory ex. (path, {recursive: true})");
+            expect(e.code).toBe(expectedError.code);
+            expect(e.errno).toBe(expectedError.errno);
+            expect(e.path).toBe(expectedError.path);
+            expect(e.syscall).toBe(expectedError.syscall);
+        }
+
+        expect(await fsPromises.rmdir(`${paths.node}/test2` , {recursive: true})).toBe(undefined)
+        expect(await ipfsFs.rmdir(`${paths.mfsPaths.root}/test2` , {recursive: true})).toBe(undefined)
+
+        expect(await ipfsFs.readdir(`${paths.mfsPaths.root}/test2`)).toBe([])
+        expect((await fsPromises.readdir(`${paths.node}`)).length).toBe(0)
+        expect(await ipfsFs.readdir(`${paths.mfsPaths.root}/`)).toBe([])
     })
 })
