@@ -1,10 +1,10 @@
-import type { StatsBase } from 'fs';
+import type { Dirent, StatsBase } from 'fs';
 import { Readable } from 'stream';
 import type CID from 'cids';
 import type { IPFS } from 'ipfs';
 import { create } from 'ipfs';
 import type { SystemError } from '@solid/community-server';
-import type { BaseEncodingOptions, OpenMode, PathLike, Mode, MakeDirectoryOptions } from 'node:fs';
+import type { BaseEncodingOptions, OpenMode, PathLike, Mode, MakeDirectoryOptions, Dir, OpenDirOptions } from 'node:fs';
 
 import type { FileHandle } from 'node:fs/promises';
 import { systemErrorInvalidArgument } from '../../errors/system/SystemErrors';
@@ -261,6 +261,62 @@ export class IpfsFs {
       entries.push(entry.name);
     }
     return entries;
+  }
+
+  private async * readDirent(path: string): AsyncIterableIterator<Dirent> {
+    const mfs = await this.mfs();
+    for await (const entry of mfs.ls(path)) {
+      yield {
+        name: entry.name,
+        isDirectory: () => entry.type === 'directory',
+        isFile: () => entry.type === 'file',
+        isBlockDevice: () => false,
+        isCharacterDevice: () => false,
+        isFIFO: () => false,
+        isSocket: () => false,
+        isSymbolicLink: () => false,
+      };
+    }
+  }
+
+  /**
+   * Asynchronously open a directory.
+   * See the POSIX [opendir(3)](https://man7.org/linux/man-pages/man3/opendir.3.html) documentation for more details.
+   * @param path
+   * @param options
+   *  Creates an <fs.Dir>, which contains all further functions for reading from and cleaning up the directory.
+   *  The encoding option sets the encoding for the path while opening the directory and subsequent read operations.
+   *  The buffer size option is ignored currently.
+   */
+  public async opendir(path: string | Buffer | URL, options?: OpenDirOptions): Promise<Dir> {
+    let dirPath = '';
+    if (typeof path === 'string') {
+      dirPath = path;
+    } else if (path instanceof Buffer) {
+      dirPath = path.toString(options?.encoding ? options?.encoding : 'utf8');
+    } else if (path instanceof URL) {
+      throw systemErrorInvalidArgument(
+        new Error(`The provided URL path type is not supported. Only string and buffer paths are supported. `),
+        'opendir',
+      );
+    }
+    // Todo [2021-12-31]: decide what to do with functions: close, closeSync, ...
+    return {
+      [Symbol.asyncIterator]: () => this.readDirent(dirPath),
+      async close(): Promise<void> {
+        throw new Error('Not Implemented.');
+      },
+      closeSync() {
+        throw new Error('Not Implemented.');
+      },
+      path: dirPath,
+      async read(): Promise<Dirent | null> {
+        throw new Error('Not Implemented.');
+      },
+      readSync(): Dirent | null {
+        throw new Error('Not Implemented.');
+      },
+    };
   }
 
   public async rmdir(path: string): Promise<void> {
