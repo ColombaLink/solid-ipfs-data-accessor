@@ -9,8 +9,18 @@ import type { SystemError } from '@solid/community-server';
  * @constructor
  */
 export function systemErrorInvalidArgument(error: Error, syscall: string): SystemError {
-  return { ...error,
-    code: 'ENOENT',
-    syscall,
-    errno: 22 };
+  const systemError: SystemError = error as SystemError;
+  systemError.code = 'ENOENT';
+  systemError.syscall = syscall;
+  systemError.errno = 22;
+  return systemError;
+}
+
+export function systemErrorNotEmptyDir(error: Error, syscall: string, path:string): SystemError {
+  const systemError: SystemError = error as SystemError;
+  systemError.code = 'ENOTEMPTY';
+  systemError.syscall = syscall;
+  systemError.errno = -39;
+  systemError.path = path;
+  return systemError;
 }
