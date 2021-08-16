@@ -10,13 +10,13 @@ import type { SystemError } from '@solid/community-server';
  */
 export function systemErrorInvalidArgument(error: Error, syscall: string): SystemError {
   const systemError: SystemError = error as SystemError;
-  systemError.code = 'ENOENT';
+  systemError.code = 'EINVAL';
   systemError.syscall = syscall;
   systemError.errno = 22;
   return systemError;
 }
 
-export function systemErrorNotEmptyDir(error: Error, syscall: string, path:string): SystemError {
+export function systemErrorNotEmptyDir(error: Error, syscall: string, path: string): SystemError {
   const systemError: SystemError = error as SystemError;
   systemError.code = 'ENOTEMPTY';
   systemError.syscall = syscall;
@@ -24,3 +24,23 @@ export function systemErrorNotEmptyDir(error: Error, syscall: string, path:strin
   systemError.path = path;
   return systemError;
 }
+
+/**
+ * No such file or directory.
+ * The specified file or directory does not exist or cannot be found.
+ * This message can occur whenever a specified file does not exist or a component of a path does not specify an existing directory.
+ *
+ * [DocSource](https://docs.microsoft.com/en-us/cpp/c-runtime-library/errno-constants?view=msvc-160)
+ * @param error
+ * @param syscall
+ * @param path
+ */
+export function systemErrorNotExists(error: Error, syscall: string, path: string): SystemError {
+  const systemError: SystemError = error as SystemError;
+  systemError.code = 'ENOENT';
+  systemError.syscall = syscall;
+  systemError.errno = -2;
+  systemError.path = path;
+  return systemError;
+}
+
