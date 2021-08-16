@@ -3,6 +3,7 @@ import {promises as fsPromises} from "fs";
 import {IpfsFs} from "../../dist";
 import {systemErrorInvalidArgument, systemErrorNotEmptyDir} from "../../src/errors/system/SystemErrors";
 import type {SystemError} from "@solid/community-server";
+import {systemErrorNotExists} from "../../dist/errors/system/SystemErrors";
 
 describe("A ipfs fs ", () => {
     let ipfsFs: IpfsFs
@@ -200,4 +201,25 @@ describe("A ipfs fs ", () => {
         expect((await fsPromises.readdir(`${paths.node}`)).length).toBe(0)
         expect(await ipfsFs.readdir(`${paths.mfsPaths.root}/`)).toBe([])
     })
-})
+
+
+    it('should unlink a file', async () => {
+        await fsPromises.writeFile(`${paths.node}/test1`, "delete me");
+        await ipfsFs.writeFile(`${paths.mfsPaths.root}/test1`, "delete me");
+
+        expect(await ipfsFs.unlink(`${paths.mfsPaths.root}/test1`))
+            .toBe(await fsPromises.unlink(`${paths.node}/test1`))
+
+        try {await ipfsFs.unlink(`${paths.mfsPaths.root}/test1`)}
+        catch (e) {
+            expect(e.message).toBe('The file with the provided file path /test1 does not exist.');
+            expect(e.code).toBe("ENOENT");
+            expect(e.errno).toBe(-2);
+            expect(e.path).toBe('/test1');
+            expect(e.syscall).toBe('unlink');
+        }
+
+    })
+
+
+    })

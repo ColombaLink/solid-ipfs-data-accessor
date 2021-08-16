@@ -7,7 +7,11 @@ import type { SystemError } from '@solid/community-server';
 import type { BaseEncodingOptions, OpenMode, PathLike, Mode, MakeDirectoryOptions, Dir, OpenDirOptions, RmDirOptions } from 'node:fs';
 
 import type { FileHandle } from 'node:fs/promises';
-import { systemErrorInvalidArgument, systemErrorNotEmptyDir } from '../../errors/system/SystemErrors';
+import {
+  systemErrorInvalidArgument,
+  systemErrorNotEmptyDir,
+  systemErrorNotExists,
+} from '../../errors/system/SystemErrors';
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -319,20 +323,20 @@ export class IpfsFs {
     };
   }
 
-  //
-  // Asynchronous rmdir(2) - delete a directory.
-  // @param path A path to a file. If a URL is provided, it must use the `file:` protocol.
-  //
-  // The recursive option  for the mfs and node.js filesystem have a slightly
-  // different semantics. If the recursive option is not set for
-  // the *node.js fs* and the directory is not empty the method will throw an error.
-  // In comparison the mfs requires the recursive option to be true if a directory
-  // should be deleted. Since the rmdir method will always delete a directory the implementation
-  // sets the recursive option to true while calling the mfs.rm method.
-  // But to mimic the same behavior as the node.js fs the rmdir method first
-  // checks if the directory is empty or the recursive option set to true.
-  // If both conditions are false an error is thrown.
-  //
+  /**
+   * Asynchronous rmdir(2) - delete a directory.
+   * @param path A absolute path of type string. (starts with /)
+   *
+   *  The recursive option  for the mfs and node.js filesystem have a slightly
+   *  different semantics. If the recursive option is not set for
+   *  the *node.js fs* and the directory is not empty the method will throw an error.
+   *  In comparison the mfs requires the recursive option to be true if a directory
+   *  should be deleted. Since the rmdir method will always delete a directory the implementation
+   *  sets the recursive option to true while calling the mfs.rm method.
+   *   But to mimic the same behavior as the node.js fs the rmdir method first
+   *  checks if the directory is empty or the recursive option set to true.
+   * If both conditions are false an error is thrown.
+  */
   public async rmdir(path: PathLike, options?: RmDirOptions): Promise<void> {
     this.assertIsString(path);
     this.assertIsAbsolute(path as string);
@@ -373,18 +377,26 @@ export class IpfsFs {
     return tryRmdir(0);
   }
 
-  public async unlink(path: string): Promise<void> {
+  /**
+   * Asynchronous unlink(2) - delete a name and possibly the file it refers to.
+   * @param path A path to a file.
+   */
+  public async unlink(path: PathLike): Promise<void> {
+    this.assertIsString(path);
+    this.assertIsAbsolute(path as string);
+
     try {
       const mfs = await this.mfs();
-      await mfs.rm(path);
+      await mfs.rm(path as string);
     } catch (ex: unknown) {
       if ((ex as any).code && (ex as any).code === 'ERR_NOT_FOUND') {
-        const sysError: SystemError = { ...(ex as SystemError),
-          code: 'ENOENT',
-          syscall: 'unlink',
-          errno: -2,
-          path };
-        throw sysError;
+        throw systemErrorNotExists(
+          new Error(
+            `The file with the provided file path ${path} does not exist.`,
+          ),
+          'unlink',
+          path as string,
+        );
       }
     }
   }
