@@ -4,7 +4,7 @@ import type CID from 'cids';
 import type { IPFS } from 'ipfs';
 import { create } from 'ipfs';
 import type { SystemError } from '@solid/community-server';
-import type { BaseEncodingOptions, OpenMode, PathLike, Mode, MakeDirectoryOptions, Dir, OpenDirOptions, RmDirOptions } from 'node:fs';
+import type { BaseEncodingOptions, OpenMode, PathLike, Mode, MakeDirectoryOptions, Dir, OpenDirOptions, RmDirOptions, StatOptions } from 'node:fs';
 
 import type { FileHandle } from 'node:fs/promises';
 import {
@@ -138,34 +138,61 @@ export class IpfsFs {
     return (await this.node).files;
   }
 
-  public async lstat(path: string): Promise<IPFSStats> {
+  /**
+   * Asynchronous lstat(2) - Get file status. Does not dereference symbolic links.
+   * @param path A absolute path of type string. If a URL, Buffer or FileHandle is provided
+   * a System Error [EINVAL 22](https://man7.org/linux/man-pages/man3/errno.3.html) will be thrown.
+   */
+  public async lstat(path: PathLike, opts?: StatOptions & { bigint?: false }): Promise<IPFSStats> {
+    this.assertIsString(path);
+    this.assertIsAbsolute(path as string);
     try {
       const mfs = await this.mfs();
-      const stats = await mfs.stat(path);
-
-      if (stats.mode) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        return {
-          isDirectory: (): boolean => stats.type === 'directory',
-          isFile: (): boolean => stats.type === 'file',
-          mode: stats.mode,
-          // I dont know yet why the date is not set by mfs.stat(x)
-          // eslint-disable-next-line no-mixed-operators
-          mtime: stats.mtime ? new Date(stats.mtime.secs * 1_000 + stats.mtime.nsecs / 1_000) : new Date(),
-          size: stats.size,
-          cid: stats.cid,
-        };
-      }
-      throw new Error('error');
+      const stats = await mfs.stat(path as string);
+      const statsResult = {
+        cid: stats.cid,
+        dev: null,
+        ino: null,
+        mode: stats.mode,
+        nlink: null,
+        uid: null,
+        gid: null,
+        rdev: null,
+        size: stats.size,
+        blksize: null,
+        blocks: null,
+        // eslint-disable-next-line line-comment-position,no-inline-comments
+        atimeMs: null, // This is the time of the last access of file data.
+        // eslint-disable-next-line line-comment-position,no-inline-comments
+        mtimeMs: null, // This is the time of last modification of file data.
+        // eslint-disable-next-line line-comment-position,no-inline-comments
+        ctimeMs: null, // This is the file's last status change timestamp (time of last change to the inode).
+        birthtimeMs: null,
+        atime: Date,
+        // eslint-disable-next-line no-mixed-operators
+        mtime: stats.mtime ? new Date(stats.mtime.secs * 1_000 + stats.mtime.nsecs / 1_000) : new Date(),
+        ctime: Date,
+        birthtime: Date,
+        isDirectory: (): boolean => stats.type === 'directory',
+        isFile: (): boolean => stats.type === 'file',
+        isBlockDevice: () => false,
+        isCharacterDevice: () => false,
+        isFIFO: () => false,
+        isSocket: () => false,
+        isSymbolicLink: () => false,
+      };
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      return statsResult;
     } catch (ex: unknown) {
       if ((ex as any).code && (ex as any).code === 'ERR_NOT_FOUND') {
-        const sysError: SystemError = { ...(ex as SystemError),
-          code: 'ENOENT',
-          syscall: 'stat',
-          errno: -2,
-          path };
-        throw sysError;
+        throw systemErrorNotExists(
+          new Error(
+            `The file with the provided file path ${path} does not exist.`,
+          ),
+          'lstat',
+          path as string,
+        );
       }
       throw ex;
     }

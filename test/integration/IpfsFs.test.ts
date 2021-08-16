@@ -221,5 +221,16 @@ describe("A ipfs fs ", () => {
 
     })
 
+    it('should list the file stats', async () => {
+        await fsPromises.writeFile(`${paths.node}/test1`, "delete me");
+        await ipfsFs.writeFile(`${paths.mfsPaths.root}/test1`, "delete me");
+
+        expect(await ipfsFs.lstat(`${paths.mfsPaths.root}/test1`))
+            .toBe(await fsPromises.lstat(`${paths.node}/test1`))
+
 
     })
+
+
+
+})
