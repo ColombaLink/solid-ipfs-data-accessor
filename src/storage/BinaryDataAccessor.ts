@@ -17,6 +17,7 @@ import {
   UnsupportedMediaTypeHttpError, XSD,
 } from '@solid/community-server';
 import { addResourceMetadata } from '@solid/community-server/dist/util/ResourceUtil';
+import {PromisifiedFs} from "../fs/ipfs/IpfsFs";
 
 /**
  * DataAccessor that uses the file system to store documents as files and containers as folders.
@@ -24,8 +25,7 @@ import { addResourceMetadata } from '@solid/community-server/dist/util/ResourceU
 export class BinaryDataAccessor implements DataAccessor {
   public constructor(
     private readonly resourceMapper: FileIdentifierMapper,
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    private readonly fsPromises: typeof import('node:fs/promises'),
+    private readonly fsPromises: PromisifiedFs,
   ) {
   }
 

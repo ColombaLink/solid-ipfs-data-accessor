@@ -16,7 +16,24 @@ import {
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/naming-convention */
 
-export class IpfsFs {
+export interface PromisifiedFs {
+  writeFile: (
+    path: PathLike | FileHandle,
+    data: string | Uint8Array,
+    options?: BaseEncodingOptions & { mode?: Mode; flag?: OpenMode } | BufferEncoding | null,
+  ) => Promise<void>;
+
+  readFile: (path: PathLike | FileHandle, options?: { encoding?: BufferEncoding; flag?: OpenMode } | null) => Promise<Buffer | string>;
+  lstat: (path: PathLike, opts?: StatOptions & { bigint?: false }) => Promise<IPFSStats>;
+  mkdir: (path: PathLike, options?: Mode | (MakeDirectoryOptions & { recursive?: boolean }) | null) => Promise<void | (undefined | string)>;
+  readdir: (path: string) => Promise<string[]>;
+  opendir: (path: string | Buffer | URL, options?: OpenDirOptions) => Promise<Dir>;
+  rmdir: (path: PathLike, options?: RmDirOptions) => Promise<void>;
+  unlink: (path: PathLike) => Promise<void>;
+
+}
+
+export class IpfsFs implements PromisifiedFs {
   private readonly node: Promise<IPFS>;
 
   public constructor(options: { repo: string }) {

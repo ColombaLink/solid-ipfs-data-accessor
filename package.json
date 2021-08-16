@@ -1,6 +1,6 @@
 {
   "name": "solid-ipfs-data-accessor",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "A starter project to kickstart the development of a CSS module.",
   "keywords": [
     "solid",
@@ -39,7 +39,7 @@
     "jest": "jest --coverageReporters text-summary --",
     "lint": "eslint . --cache",
     "prepare": "npm run build",
-    "start": "npm run build && npm run build && npx community-solid-server -c config/default.json -m . -f /",
+    "start": "npm run build && npm run build && npx community-solid-server -c config/file.json -m . -f /",
     "test": "npm run test:ts && npm run jest",
     "test:ts": "tsc -p test --noEmit",
     "test:integration": "jest --coverageReporters text-summary -- test/integration",

@@ -1,7 +1,14 @@
 {
-  "@context": "https://linkedsoftwaredependencies.org/bundles/npm/@solid/community-server/^1.0.0/components/context.jsonld",
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/solid-ipfs-data-accessor/^1.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solid/community-server/^1.0.0/components/context.jsonld",
+    {
+      "solid-ipfs-data-accessor": "urn:solid-ipfs-data-accessor:default:",
+      "solid-server": "urn:solid-server:default:"
+    }
+  ],
   "import": [
-    "files-scs:config/app/app/default.json",
+    "files-scs:config/app/main/default.json",
     "files-scs:config/app/init/default.json",
     "files-scs:config/http/handler/default.json",
     "files-scs:config/http/middleware/websockets.json",
@@ -11,14 +18,15 @@
     "files-scs:config/identity/handler/default.json",
     "files-scs:config/identity/ownership/token.json",
     "files-scs:config/identity/pod/static.json",
+    "files-scs:config/identity/registration/enabled.json",
     "files-scs:config/ldp/authentication/dpop-bearer.json",
     "files-scs:config/ldp/authorization/webacl.json",
     "files-scs:config/ldp/handler/default.json",
     "files-scs:config/ldp/metadata-parser/default.json",
     "files-scs:config/ldp/metadata-writer/default.json",
     "files-scs:config/ldp/permissions/acl.json",
-    "files-scs:config/storage/key-value/memory.json",
-    "files-scs:config/storage/resource-store/file.json",
+    "files-scs:config/storage/key-value/resource-store.json",
+    "files-scs:config/storage/middleware/default.json",
     "files-scs:config/util/auxiliary/acl.json",
     "files-scs:config/util/identifiers/suffix.json",
     "files-scs:config/util/index/default.json",
@@ -30,6 +38,33 @@
   "@graph": [
     {
       "comment": "A single-pod server that stores its resources on disk."
+    },
+
+    {
+      "comment": "A default store setup with a file system backend.",
+      "@id": "urn:solid-server:default:ResourceStore_Backend",
+      "@type": "DataAccessorBasedStore",
+      "identifierStrategy": { "@id": "urn:solid-server:default:IdentifierStrategy" },
+      "auxiliaryStrategy": { "@id": "urn:solid-server:default:AuxiliaryStrategy" },
+      "accessor": { "@id": "urn:solid-server:default:FileDataAccessor" }
+    },
+    {
+      "comment": "Stores data on a file system.",
+      "@id": "urn:solid-server:default:FileDataAccessor",
+      "@type": "BinaryDataAccessor",
+      "BinaryDataAccessor:_resourceMapper": { "@id": "urn:solid-server:default:FileIdentifierMapper" },
+      "BinaryDataAccessor:_fsPromises": {
+        "@type": "IpfsFs",
+        "IpfsFs:_options_repo": "/tmp/ipfs"
+      }
+    },
+    {
+      "comment": "A default store setup with a file system backend.",
+      "@id": "urn:solid-server:default:ResourceStore_Backend",
+      "@type": "DataAccessorBasedStore",
+      "identifierStrategy": { "@id": "urn:solid-server:default:IdentifierStrategy" },
+      "auxiliaryStrategy": { "@id": "urn:solid-server:default:AuxiliaryStrategy" },
+      "accessor": { "@id": "urn:solid-server:default:FileDataAccessor" }
     }
   ]
 }
