@@ -39,7 +39,7 @@
     "jest": "jest --coverageReporters text-summary --",
     "lint": "eslint . --cache",
     "prepare": "npm run build",
-    "start": "npm run build && npm run build && npx community-solid-server -c config/file.json -m . -f /",
+    "start": "npx community-solid-server -c config/file.json -m . -f / -l debug",
     "test": "npm run test:ts && npm run jest",
     "test:ts": "tsc -p test --noEmit",
     "test:integration": "jest --coverageReporters text-summary -- test/integration",
