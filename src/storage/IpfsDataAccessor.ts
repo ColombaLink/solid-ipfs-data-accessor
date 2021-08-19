@@ -21,7 +21,7 @@ import { PassThrough } from 'stream';
 export class IpfsDataAccessor extends BinaryDataAccessor implements DataAccessor {
   public constructor(
     resourceMapper: FileIdentifierMapper,
-    fsPromises: PromisifiedFs,
+    fsPromises: IpfsFs,
   ) {
     super(resourceMapper, fsPromises);
   }

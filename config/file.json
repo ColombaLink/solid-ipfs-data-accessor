@@ -51,13 +51,18 @@
     {
       "comment": "Stores data on a file system.",
       "@id": "urn:solid-server:default:FileDataAccessor",
-      "@type": "BinaryDataAccessor",
-      "BinaryDataAccessor:_resourceMapper": { "@id": "urn:solid-server:default:FileIdentifierMapper" },
-      "BinaryDataAccessor:_fsPromises": {
-        "@type": "IpfsFs",
-        "IpfsFs:_options_repo": "/tmp/ipfs"
-      }
+      "@type": "IpfsDataAccessor",
+      "IpfsDataAccessor:_resourceMapper": { "@id": "urn:solid-server:default:FileIdentifierMapper" },
+      "IpfsDataAccessor:_fsPromises": { "@id":  "urn:solid-server:default:Fs" }
     },
+
+    {
+      "comment": "A ipfs file system which is compatible with the node.js fs.",
+      "@id": "urn:solid-server:default:Fs",
+      "@type": "IpfsFs",
+      "IpfsFs:_options_repo": "/tmp/ipfs"
+    },
+
     {
       "comment": "A default store setup with a file system backend.",
       "@id": "urn:solid-server:default:ResourceStore_Backend",
