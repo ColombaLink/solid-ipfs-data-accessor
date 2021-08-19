@@ -8,7 +8,7 @@ import {
   RepresentationMetadata, SOLID_META, SystemError, toLiteral, UnsupportedMediaTypeHttpError, XSD
 } from "@solid/community-server";
 import {mockFs} from "../../util/Util";
-import {BinaryDataAccessor} from "../../../src/storage/BinaryDataAccessor";
+import {BinaryDataAccessor} from "../../../src";
 jest.mock('fs');
 
 import {promises} from "fs";

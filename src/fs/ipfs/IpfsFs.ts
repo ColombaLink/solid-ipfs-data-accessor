@@ -151,7 +151,7 @@ export class IpfsFs implements PromisifiedFs {
     return (await this.mfs()).stat(path);
   }
 
-  private async mfs() {
+  public async mfs() {
     return (await this.node).files;
   }
 

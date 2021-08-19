@@ -1,5 +1,5 @@
-import type { Stats } from 'fs';
-import { createWriteStream, createReadStream } from 'fs';
+import type { Stats, ReadStream } from 'fs';
+import { createReadStream, createWriteStream, WriteStream } from 'fs';
 import type { Readable } from 'stream';
 import type { Quad } from 'rdf-js';
 import type {
@@ -17,15 +17,15 @@ import {
   UnsupportedMediaTypeHttpError, XSD,
 } from '@solid/community-server';
 import { addResourceMetadata } from '@solid/community-server/dist/util/ResourceUtil';
-import {PromisifiedFs} from "../fs/ipfs/IpfsFs";
+import type { PromisifiedFs } from '../fs/ipfs/IpfsFs';
 
 /**
  * DataAccessor that uses the file system to store documents as files and containers as folders.
  */
 export class BinaryDataAccessor implements DataAccessor {
   public constructor(
-    private readonly resourceMapper: FileIdentifierMapper,
-    private readonly fsPromises: PromisifiedFs,
+    protected readonly resourceMapper: FileIdentifierMapper,
+    protected readonly fsPromises: PromisifiedFs,
   ) {
   }
 
@@ -149,7 +149,7 @@ export class BinaryDataAccessor implements DataAccessor {
    * @throws NotFoundHttpError
    * If the file/folder doesn't exist.
    */
-  private async getStats(path: string): Promise<Stats> {
+  protected async getStats(path: string): Promise<Stats> {
     try {
       return await this.fsPromises.lstat(path);
     } catch (error: unknown) {
@@ -245,7 +245,7 @@ export class BinaryDataAccessor implements DataAccessor {
    *
    * @param identifier - Identifier of the resource (not the metadata!).
    */
-  private async getRawMetadata(identifier: ResourceIdentifier): Promise<Quad[]> {
+  protected async getRawMetadata(identifier: ResourceIdentifier): Promise<Quad[]> {
     try {
       const metadataLink = await this.resourceMapper.mapUrlToFilePath(identifier, true);
 
@@ -342,7 +342,7 @@ export class BinaryDataAccessor implements DataAccessor {
    * @param path - The filepath of the file to be created.
    * @param data - The data to be put in the file.
    */
-  private async writeDataFile(path: string, data: Readable): Promise<void> {
+  protected async writeDataFile(path: string, data: Readable): Promise<void> {
     return new Promise((resolve, reject): any => {
       const writeStream = createWriteStream(path);
       data.pipe(writeStream);
