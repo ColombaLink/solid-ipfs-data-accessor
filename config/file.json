@@ -28,7 +28,6 @@
     "files-scs:config/storage/key-value/resource-store.json",
     "files-scs:config/storage/middleware/default.json",
     "files-scs:config/util/auxiliary/acl.json",
-    "files-scs:config/util/identifiers/suffix.json",
     "files-scs:config/util/index/default.json",
     "files-scs:config/util/logging/winston.json",
     "files-scs:config/util/representation-conversion/default.json",
@@ -70,6 +69,29 @@
       "identifierStrategy": { "@id": "urn:solid-server:default:IdentifierStrategy" },
       "auxiliaryStrategy": { "@id": "urn:solid-server:default:AuxiliaryStrategy" },
       "accessor": { "@id": "urn:solid-server:default:FileDataAccessor" }
+    },
+
+    {
+      "@id": "urn:solid-server:default:IdentifierStrategy",
+      "@type": "SingleRootIdentifierStrategy",
+      "baseUrl": { "@id": "urn:solid-server:default:variable:baseUrl" }
+    },
+
+    {
+      "comment": "Only required when pod creation is enabled.",
+      "@id": "urn:solid-server:default:IdentifierGenerator",
+      "@type": "SuffixIdentifierGenerator",
+      "base": { "@id": "urn:solid-server:default:variable:baseUrl" }
+    },
+
+    {
+      "comment": "Only required when using a file-based backend.",
+      "@id": "urn:solid-server:default:FileIdentifierMapper",
+      "@type": "IpfsExtensionBasedMapper",
+      "IpfsExtensionBasedMapper:_base": { "@id": "urn:solid-server:default:variable:baseUrl" },
+      "IpfsExtensionBasedMapper:_rootFilepath": { "@id": "urn:solid-server:default:variable:rootFilePath" },
+      "IpfsExtensionBasedMapper:_fs": { "@id": "urn:solid-server:default:Fs" }
     }
+
   ]
 }
