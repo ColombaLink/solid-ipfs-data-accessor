@@ -1,4 +1,5 @@
 [
     "LoggerFactory",
-    "FileIdentifierMapper"
-    ]
+    "FileIdentifierMapper",
+    "BaseFileIdentifierMapper"
+ ]

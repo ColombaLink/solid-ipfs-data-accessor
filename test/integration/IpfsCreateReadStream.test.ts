@@ -1,7 +1,7 @@
 import {IpfsFs} from "../../dist";
 import {promises as fsPromises, ReadStream, WriteStream} from "fs";
-import { streamAsAsyncIterator} from "../../src/fs/ipfs/CreateWriteStream";
 import {PassThrough} from "stream";
+import {streamAsAsyncIterator} from "../../dist/fs/ipfs/CreateWriteStream";
 
 describe("A ipfs fs ", () => {
     let ipfsFs: IpfsFs

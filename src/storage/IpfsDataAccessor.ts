@@ -9,11 +9,12 @@ import type {
 import {
   guardStream, isSystemError, NotFoundHttpError, parseQuads,
 } from '@solid/community-server';
-import type { PromisifiedFs, IpfsFs } from '../fs/ipfs/IpfsFs';
+import type { IpfsFs } from '../fs/ipfs/IpfsFs';
 import { BinaryDataAccessor } from './BinaryDataAccessor';
 
-import { createReadStream, streamAsAsyncIterator } from '../fs/ipfs/CreateWriteStream';
 import { PassThrough } from 'stream';
+import {createReadStream} from "../util/stream/CreateIpfsReadStream";
+import {streamAsAsyncIterator} from "../util/stream/StreamAsAyncIterator";
 
 /**
  * DataAccessor that uses the Interplanetary File System to store documents as files and containers as folders.
