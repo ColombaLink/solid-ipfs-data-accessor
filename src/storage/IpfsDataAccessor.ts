@@ -3,18 +3,15 @@ import type { Quad } from 'rdf-js';
 import type { DataAccessor,
   FileIdentifierMapper,
   Guarded,
-  ResourceIdentifier, ResourceLink,
-
+  ResourceIdentifier,
   RepresentationMetadata } from '@solid/community-server';
-import { DC,
-  guardStream, isSystemError, joinFilePath, NotFoundHttpError, parseQuads, POSIX, SOLID_META, toLiteral, XSD } from '@solid/community-server';
+import { guardStream, isSystemError, NotFoundHttpError, parseQuads, toLiteral } from '@solid/community-server';
 import type { IpfsFs, IPFSStats } from '../fs/ipfs/IpfsFs';
 import { BinaryDataAccessor } from './BinaryDataAccessor';
 
 import { PassThrough } from 'stream';
 import { createReadStream } from '../util/stream/CreateIpfsReadStream';
 import { streamAsAsyncIterator } from '../util/stream/StreamAsAyncIterator';
-import type { Stats } from 'fs';
 import { IPFS } from '../Vocabularies';
 import { namedNode } from '@rdfjs/data-model';
 
