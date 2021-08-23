@@ -1,5 +1,5 @@
-import type { Stats, ReadStream } from 'fs';
-import { createReadStream, createWriteStream, WriteStream } from 'fs';
+import type { Stats } from 'fs';
+import { createReadStream, createWriteStream } from 'fs';
 import type { Readable } from 'stream';
 import type { Quad } from 'rdf-js';
 import type {
@@ -17,7 +17,7 @@ import {
   UnsupportedMediaTypeHttpError, XSD,
 } from '@solid/community-server';
 import { addResourceMetadata } from '@solid/community-server/dist/util/ResourceUtil';
-import type { PromisifiedFs } from '../fs/ipfs/IpfsFs';
+import type {IPFSStats, PromisifiedFs} from '../fs/ipfs/IpfsFs';
 
 /**
  * DataAccessor that uses the file system to store documents as files and containers as folders.
@@ -294,6 +294,7 @@ export class BinaryDataAccessor implements DataAccessor {
       const metadata = new RepresentationMetadata(childLink.identifier);
       addResourceMetadata(metadata, childStats.isDirectory());
       this.addPosixMetadata(metadata, childStats);
+      this.addAdditionalMetadata(metadata, childStats);
       yield metadata;
     }
   }
@@ -351,5 +352,10 @@ export class BinaryDataAccessor implements DataAccessor {
       writeStream.on('error', reject);
       writeStream.on('finish', resolve);
     });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  protected addAdditionalMetadata(metadata: RepresentationMetadata, childStats: IPFSStats): void {
+
   }
 }

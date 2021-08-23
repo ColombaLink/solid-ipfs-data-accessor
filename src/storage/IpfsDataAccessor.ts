@@ -1,20 +1,22 @@
 import type { Readable } from 'stream';
 import type { Quad } from 'rdf-js';
-import type {
-  DataAccessor,
+import type { DataAccessor,
   FileIdentifierMapper,
   Guarded,
-  ResourceIdentifier,
-} from '@solid/community-server';
-import {
-  guardStream, isSystemError, NotFoundHttpError, parseQuads,
-} from '@solid/community-server';
-import type { IpfsFs } from '../fs/ipfs/IpfsFs';
+  ResourceIdentifier, ResourceLink,
+
+  RepresentationMetadata } from '@solid/community-server';
+import { DC,
+  guardStream, isSystemError, joinFilePath, NotFoundHttpError, parseQuads, POSIX, SOLID_META, toLiteral, XSD } from '@solid/community-server';
+import type { IpfsFs, IPFSStats } from '../fs/ipfs/IpfsFs';
 import { BinaryDataAccessor } from './BinaryDataAccessor';
 
 import { PassThrough } from 'stream';
-import {createReadStream} from "../util/stream/CreateIpfsReadStream";
-import {streamAsAsyncIterator} from "../util/stream/StreamAsAyncIterator";
+import { createReadStream } from '../util/stream/CreateIpfsReadStream';
+import { streamAsAsyncIterator } from '../util/stream/StreamAsAyncIterator';
+import type { Stats } from 'fs';
+import { IPFS } from '../Vocabularies';
+import { namedNode } from '@rdfjs/data-model';
 
 /**
  * DataAccessor that uses the Interplanetary File System to store documents as files and containers as folders.
@@ -65,6 +67,20 @@ export class IpfsDataAccessor extends BinaryDataAccessor implements DataAccessor
       }
       return [];
     }
+  }
+
+  protected addAdditionalMetadata(metadata: RepresentationMetadata, childStats: IPFSStats): void {
+    this.addIpfsMetadata(metadata, childStats);
+  }
+
+  /**
+   * Helper function to add ipfs file system related metadata.
+   * @param metadata - metadata object to add to
+   * @param stats - Stats of the file/directory corresponding to the resource.
+   */
+  private addIpfsMetadata(metadata: RepresentationMetadata, stats: IPFSStats): void {
+    metadata.add(IPFS.cid,
+      toLiteral(stats.cid.toString(), namedNode('http://www.w3.org/2001/XMLSchema#string')));
   }
 
   /**
