@@ -1,23 +1,23 @@
 {
   "name": "solid-ipfs-data-accessor",
   "version": "1.0.0",
-  "description": "A starter project to kickstart the development of a CSS module.",
+  "description": "A Community Solid Server (CSS) module which provides a IPFS data accessor.",
   "keywords": [
     "solid",
+    "ipfs",
     "linked-data",
     "rdf",
-    "ldp",
-    "starter-module"
+    "ldp"
   ],
   "license": "MIT",
-  "author": " <your@email.com> (https://optional.link/to-your-website/)",
+  "author": "Fabrizio Parrillo <fabrizio.parrillo@colomba.link>",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "repository": "git@github.com:GitHubUserName/RepositoryName.git",
+  "repository": "git@ColombaLink/solid-ipfs-data-accessor.git",
   "bugs": {
-    "url": "https://github.com/GitHubUserName/RepositoryName/issues"
+    "url": "https://github.com/ColombaLink/solid-ipfs-data-accessor/issues"
   },
-  "homepage": "https://github.com/GitHubUserName/RepositoryName#readme",
+  "homepage": "https://github.com/ColombaLink/solid-ipfs-data-accessor#readme",
   "files": [
     "config",
     "dist"
