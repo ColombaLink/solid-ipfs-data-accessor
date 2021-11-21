@@ -1,7 +1,7 @@
 {
   "name": "solid-ipfs-data-accessor",
   "version": "1.0.0",
-  "description": "A Community Solid Server (CSS) module which provides a IPFS data accessor.",
+  "description": "A Community Solid Server (CSS) module which provides an Interplanetary Filesystem (IPFS) data accessor.",
   "keywords": [
     "solid",
     "ipfs",
